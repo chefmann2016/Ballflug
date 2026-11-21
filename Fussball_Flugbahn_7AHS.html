@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de-AT">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Der Ballflug · Mathematik 7. AHS</title>
+<style>
+:root{color-scheme:light;--ink:#122e24;--green:#116442;--mint:#e2f4df;--paper:#f3f6ef;--line:#cedacd;--blue:#245aa8;--orange:#9d4900}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:1rem/1.58 system-ui,sans-serif}main{max-width:1060px;margin:auto;padding:24px clamp(14px,4vw,40px) 50px}header{background:#123e2c;color:#f8fff4;padding:clamp(22px,5vw,50px);border-radius:24px;margin-bottom:20px}header p{max-width:64ch;margin-bottom:0}.eyebrow{font-weight:700;letter-spacing:.08em;font-size:.78rem;text-transform:uppercase;color:#bde8b9}h1,h2,h3{line-height:1.15;margin:.4em 0}h1{font-size:clamp(2.2rem,7vw,4.5rem);letter-spacing:-.055em}h2{font-size:clamp(1.45rem,4vw,2.15rem);letter-spacing:-.03em}section,article{background:white;border:1px solid var(--line);border-radius:18px;padding:clamp(14px,3vw,26px);margin:16px 0}article{margin:10px 0}nav,.row,.fields{display:flex;gap:10px;flex-wrap:wrap;align-items:center}a{color:var(--green)}nav a{background:#fff;border-radius:20px;padding:5px 13px}button,select,input{font:inherit}button,select{border:1px solid #aec7b4;border-radius:10px;background:#eef6ec;color:var(--ink);padding:8px 13px;cursor:pointer;font-weight:650}button.primary{background:var(--green);color:white;border-color:var(--green)}button:disabled{opacity:.55;cursor:default}:focus-visible{outline:3px solid #2866bb;outline-offset:3px}canvas{width:100%;display:block;border-radius:12px;background:#eff8ee;margin:12px 0}.formula{font-weight:700;color:var(--green);font-size:clamp(1rem,3vw,1.25rem)}.range{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;margin-top:12px}input[type=range]{width:100%;accent-color:var(--green)}.readouts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.readouts div,.note{background:var(--mint);padding:10px 12px;border-radius:10px}.readouts strong{display:block;font-size:1.1rem;font-variant-numeric:tabular-nums}.readouts span{font-size:.83rem}details{margin:8px 0;padding:6px 10px;background:var(--paper);border-radius:8px}summary{cursor:pointer;font-weight:650}details p{margin:.35em 0}.fields label{display:grid;font-weight:650}.fields input{border:1px solid #879f90;border-radius:8px;padding:6px 8px;width:8em}output.feedback{display:block;margin-top:6px;font-weight:650}.ok{color:var(--green)}.retry{color:#8c3d08}.blue{color:var(--blue)}.orange{color:var(--orange)}.quiet{font-size:.9rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media(max-width:640px){.grid{grid-template-columns:1fr}.readouts div{padding:7px}.range{grid-template-columns:1fr;gap:2px}}
+</style>
+<main>
+<header>
+<div class="eyebrow">Mathematik · 7. Klasse AHS</div>
+<h1>Der Ballflug</h1>
+<p>Roland schießt im Park einen Fußball. Wo landet er? Wo kann Julia ihn fangen? Beobachte den Schuss und begründe deine Antworten mit der Flugbahn und ihren Ableitungen.</p>
+</header>
+<nav aria-label="Abschnitte"><a href="#flug">Ballflug</a><a href="#aufgaben">Flugbahn berechnen</a><a href="#tempo">Geschwindigkeit untersuchen</a></nav>
+<section id="flug">
+<h2>Beobachte den Schuss</h2>
+<p class="formula">h(x) = −0,003x³ + 0,057x² &nbsp; (x ≥ 0)</p>
+<p><b>x</b> ist die horizontale Entfernung von der Abschussstelle in Metern. <b>h(x)</b> ist die Höhe über der Wiese in Metern. Im Rechenmodell zählt der Mittelpunkt des Balls. Die Höhenachse ist zur besseren Sichtbarkeit gestreckt.</p>
+<div class="row">
+<button type="button" class="primary" id="play">Schuss starten</button>
+<button type="button" id="pause" disabled>Pause</button>
+<button type="button" id="reset">Zurücksetzen</button>
+<label for="view">Ansicht</label>
+<select id="view"><option value="flight">Freier Flug</option><option value="catch">Fanghöhe 1,80 m</option><option value="frame">Klettergerüst</option></select>
+</div>
+<canvas id="flight" role="img" aria-label="Animierter Fußball auf dem Graphen der Höhe über der horizontalen Entfernung"></canvas>
+<div class="range"><label for="time">Zeitlupe vor- und zurückschieben</label><input id="time" type="range" min="0" max="1.9" step="0.001" value="0"></div>
+<div class="readouts"><div><span>Zeit t</span><strong id="clock"></strong></div><div><span>Entfernung x</span><strong id="distance"></strong></div><div><span>Höhe h(x)</span><strong id="height"></strong></div></div>
+<p class="quiet">Der Schuss läuft in Zeitlupe. Die Zeitanzeige beruht auf dem Zusatzmodell im Abschnitt zur Geschwindigkeit. Die Fanglinie und das Gerüst sind Messhilfen. Beim Gerüst siehst du ab der möglichen Berührung die rechnerisch fortgesetzte freie Flugbahn.</p>
+</section>
+<section id="aufgaben">
+<h2>Berechne die Flugbahn</h2>
+<p>Schätze zuerst am Graphen. Rechne anschließend auf Papier und prüfe deine Zahlen. Runde Näherungswerte auf zwei Dezimalstellen.</p>
+<div id="flightTasks" class="grid"></div>
+</section>
+<section id="tempo">
+<h2>Wie schnell ändert sich die Höhe?</h2>
+<p>Für die Geschwindigkeitsaufgaben ergänzen wir ein Zeitmodell. Der Ball bewegt sich horizontal gleichförmig mit <b>10 m/s</b>, also gilt <b>x(t) = 10t</b>. Damit ist die Höhe nach t Sekunden:</p>
+<p class="formula">H(t) = h(10t) = −3t³ + 5,7t² &nbsp; (0 ≤ t ≤ 1,9)</p>
+<p class="note">Im <b>Zeit-Höhen-Diagramm</b> liefert die <span class="blue"><b>Sekantensteigung</b></span> die durchschnittliche Vertikalgeschwindigkeit und die <span class="orange"><b>Tangentensteigung</b></span> die momentane Vertikalgeschwindigkeit. Beide haben die Einheit m/s. Ein negatives Vorzeichen bedeutet, dass der Ball sinkt.</p>
+<label class="row"><input id="measure" type="checkbox"> Steigungen und Messwerte einblenden</label>
+<canvas id="velocity" role="img" aria-label="Zeit-Höhen-Diagramm mit zwei verschiebbaren Punkten sowie zuschaltbarer Sekante und Tangente"></canvas>
+<div class="range"><label for="start">Erster Zeitpunkt A</label><input id="start" type="range" min="0" max="1.89" step="0.01" value="1"></div>
+<div class="range"><label for="end">Zweiter Zeitpunkt B</label><input id="end" type="range" min="1.01" max="1.9" step="0.01" value="1.5"></div>
+<p id="points"></p>
+<p id="slopes" hidden></p>
+<p>Schiebe B näher zu A und beobachte, wie sich die Sekante der Tangente annähert. Starte bei A = 1,00 s und vergleiche B = 1,50 s mit B = 1,01 s.</p>
+<div id="speedTasks" class="grid"></div>
+</section>
+</main>
+<script>
+'use strict';
+const byId = id => document.getElementById(id);
+const h = x => x*x*(0.057-0.003*x);
+const H = t => h(10*t);
+const vy = t => 11.4*t-9*t*t;
+const format = (value, digits=2) => new Intl.NumberFormat('de-AT', {
+  minimumFractionDigits:digits, maximumFractionDigits:digits
+}).format(Math.abs(value)<0.5*10**(-digits) ? 0 : value);
+const tasks = {
+  flightTasks: [
+    ['a1 · Landung','Bestimme den größtmöglichen sinnvollen Definitionsbereich [0; b] für den freien Flug. Gib b in Metern an.',
+      [['b in m',19]],'Was gilt für die Höhe, wenn der Ball den Boden wieder berührt?',
+      'Klammere x² aus und bestimme alle Nullstellen.',
+      'h(x) = x²(0,057 − 0,003x). Die Nullstellen liegen bei 0 und bei 0,057 ÷ 0,003 = 19. D = [0; 19], weil die Höhe dazwischen positiv und für x > 19 negativ ist.'],
+    ['a2 · Höchster Punkt','Berechne die horizontale Entfernung und die Höhe des höchsten Punktes.',
+      [['x in m',38/3],['h(x) in m',h(38/3)]],'Welche Steigung hat der Graph am höchsten Punkt?',
+      'Setze h′(x) = −0,009x² + 0,114x gleich null. Vergleiche die Höhe an der inneren kritischen Stelle mit den Randwerten.',
+      'h′(x) = x(0,114 − 0,009x). Die innere Nullstelle ist x = 38/3. Dort ist h(x) ≈ 3,05 m. An beiden Rändern ist die Höhe 0 m. Der höchste Punkt liegt bei etwa (12,67 | 3,05).'],
+    ['b · Julias Fangpositionen','Bestimme beide horizontalen Entfernungen, an denen Julia den Ball auf 1,80 m Höhe fangen kann. Gib die kleinere zuerst ein.',
+      [['Aufwärts in m',12-Math.sqrt(24)],['Abwärts in m',12+Math.sqrt(24)]],'Wähle die Ansicht „Fanghöhe 1,80 m“. Wann trifft die Flugbahn auf die waagrechte Linie?',
+      'Löse h(x) = 1,80 auf [0; 19], etwa mit dem Grafikrechner. Verwende die Schnittpunkte der Graphen y = h(x) und y = 1,80.',
+      'Im Flugbereich erhältst du x ≈ 7,10 m (beim Steigen) und x ≈ 16,90 m (beim Sinken). Die Gleichung hat auch die Lösung x = −5 m. Sie liegt außerhalb des Flugbereichs.'],
+    ['c · Klettergerüst','Das Gerüst ist bei x = 10 m genau 2,80 m hoch. Berechne die Ballhöhe dort und begründe auf Papier, ob der Ball darüberfliegt.',
+      [['Ballhöhe in m',2.7]],'Die Höhe an der Position des Gerüsts entscheidet.',
+      'Setze x = 10 in h(x) ein und vergleiche mit 2,80 m.',
+      'h(10) = −0,003 · 1 000 + 0,057 · 100 = 2,70 m. Der Ball liegt an dieser Stelle 0,10 m unter der Oberkante und kommt daher nicht darüber.']
+  ],
+  speedTasks: [
+    ['d · Durchschnittliche Vertikalgeschwindigkeit','Berechne die durchschnittliche Vertikalgeschwindigkeit von t = 1,00 s bis t = 1,50 s. Erkläre, was das Ergebnis über die Höhenänderung aussagt.',
+      [['Durchschnitt in m/s',0]],'Berechne zuerst beide Höhenwerte.',
+      'Teile die Höhenänderung H(1,50) − H(1,00) durch 0,50 s.',
+      'Beide Höhen sind 2,70 m. Die Höhenänderung ist 0 m, also beträgt die durchschnittliche Vertikalgeschwindigkeit 0 m/s. Dazwischen steigt der Ball zunächst und sinkt danach wieder.'],
+    ['e · Momentane Vertikalgeschwindigkeit','Berechne die momentane Vertikalgeschwindigkeit bei t = 1,00 s und t = 1,50 s. Deute beide Vorzeichen.',
+      [['Bei 1,00 s in m/s',2.4],['Bei 1,50 s in m/s',-3.15]],'Leite die Zeitfunktion H(t) ab.',
+      'H′(t) = −9t² + 11,4t. Setze beide Zeitpunkte in die Ableitung ein.',
+      'H′(1,00) = 2,40 m/s (steigt), H′(1,50) = −3,15 m/s (sinkt). Die Momentanwerte beschreiben die Änderung genau an diesen Zeitpunkten.'],
+    ['f · Betrag der Geschwindigkeit','Wie groß ist der Betrag der momentanen Geschwindigkeit bei t = 1,50 s? Berücksichtige beide Bewegungsrichtungen.',
+      [['Betrag in m/s',Math.hypot(10,3.15)]],'Die horizontale und die vertikale Geschwindigkeit stehen senkrecht aufeinander.',
+      'Verwende den Satz des Pythagoras mit vₓ = 10 m/s und vᵧ = −3,15 m/s.',
+      'Der Betrag ist √(10² + (−3,15)²) ≈ 10,48 m/s.']
+  ]
+};
+
+function buildExercises() {
+  for(const [id, exercises] of Object.entries(tasks)) {
+    for(const [title, question, fields, hint, step, solution] of exercises) {
+      const article = document.createElement('article');
+      article.innerHTML = '<h3>'+title+'</h3><p>'+question+'</p><form><div class="fields"></div><p><button type="submit">Antwort prüfen</button></p><output class="feedback" aria-live="polite"></output></form>';
+      const form = article.querySelector('form');
+      for (const [caption] of fields) {
+        const label = document.createElement('label');
+        label.textContent = caption;
+        const input = document.createElement('input');
+        input.inputMode = 'decimal';
+        label.append(input);
+        form.querySelector('.fields').append(label);
+      }
+      const inputs = [...form.querySelectorAll('input')];
+      const feedback = form.querySelector('output');
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const messages = inputs.map((input,index) => {
+          const value = input.value.trim().replace('−','-').replace(',','.');
+          const valid = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value);
+          return !valid ? 'Zahl eingeben' : Math.abs(Number(value)-fields[index][1]) <= 0.00500001 ? 'richtig' : 'noch einmal prüfen';
+        });
+        const correct = messages.every(message => message === 'richtig');
+        feedback.className = 'feedback '+(correct ? 'ok' : 'retry');
+        feedback.textContent = correct ? 'Richtig! Vergleiche auch deine Begründung mit dem Lösungsweg.' : messages.map((message,index) => fields[index][0]+' – '+message).join(' · ');
+      });
+      for(const [label, content] of [['Tipp 1 anzeigen',hint],['Tipp 2 anzeigen',step],['Lösungsweg anzeigen',solution]]) {
+        const details = document.createElement('details');
+        details.innerHTML = '<summary>'+label+'</summary><p>'+content+'</p>';
+        article.append(details);
+      }
+      byId(id).append(article);
+    }
+  }
+}
+
+function plot(id, max, timeAxis) {
+  const canvas = byId(id);
+  const width = canvas.clientWidth;
+  const height = id === 'flight' ? Math.max(238, Math.min(350, width*.43)) : 250;
+  const pixelRatio = window.devicePixelRatio || 1;
+  canvas.style.height = height+'px';
+  if(canvas.width !== Math.round(width*pixelRatio) || canvas.height !== Math.round(height*pixelRatio)) {
+    canvas.width = Math.round(width*pixelRatio);
+    canvas.height = Math.round(height*pixelRatio);
+  }
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);
+  ctx.clearRect(0,0,width,height);
+  const left = 38, right = width-21, bottom = height-42, top = 26;
+  const X = x => left+x/max*(right-left);
+  const Y = y => bottom-y/3.6*(bottom-top);
+  function line(x1,y1,x2,y2,color,weight=1,dash=[]) {
+    ctx.beginPath();
+    ctx.strokeStyle=color;
+    ctx.lineWidth=weight;
+    ctx.setLineDash(dash);
+    ctx.moveTo(X(x1),Y(y1));ctx.lineTo(X(x2),Y(y2));ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  function label(value,x,y,color='#254339',align='left') {
+    ctx.font = '12px system-ui';ctx.fillStyle=color;ctx.textAlign=align;ctx.fillText(value,x,y);
+  }
+  ctx.fillStyle = timeAxis ? '#f1f7fa' : '#e8f5f9';
+  ctx.fillRect(0,0,width,bottom);
+  if(!timeAxis) {
+    ctx.fillStyle='#bbdcae';ctx.fillRect(0,bottom,width,height-bottom);
+  }
+  for(let y=0;y<=3;y++) {
+    line(0,y,max,y,y===0 ? '#345845' : '#c8dcd3');
+    label(String(y),left-8,Y(y)+4,'#254339','right');
+  }
+  const tick = timeAxis ? 0.25 : 2;
+  for(let x=0; x<=max+0.00001;x+=tick) {
+    line(x,0,x,3.6,x===0 ? '#345845' : '#c8dcd3');
+    label(timeAxis ? Number(x.toFixed(2)).toString().replace('.',',') : String(x),X(x),bottom+17,'#254339','center');
+  }
+  label('Höhe (m)',left,17);
+  label(timeAxis ? 'Zeit t (s)' : 'Horizontale Entfernung x (m)',right,height-6,'#254339','right');
+  function path(fn,end,color,weight) {
+    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=weight;
+    for(let i=0;i<=120;i++){
+      const x=end*i/120;
+      if(i===0) ctx.moveTo(X(x),Y(fn(x)));
+      else ctx.lineTo(X(x),Y(fn(x)));
+    }
+    ctx.stroke();
+  }
+  function dot(x,y,color,radius=5) {
+    ctx.beginPath();ctx.arc(X(x),Y(y),radius,0,2*Math.PI);
+    ctx.fillStyle=color;ctx.fill();
+  }
+  function clip() {
+    ctx.save();ctx.beginPath();ctx.rect(left,top,right-left,bottom-top);ctx.clip();
+  }
+  return {ctx,X,Y,line,label,path,dot,clip};
+}
+
+let t = 0;
+let playing = false;
+let frame = 0;
+let last = null;
+const time = byId('time');
+
+function drawFlight() {
+  const p = plot('flight',20,false);
+  const mode = byId('view').value;
+  p.path(h,19,'#658675',2);
+  if (mode === 'catch') {
+    p.line(0,1.8,20,1.8,'#245aa8',2,[6,4]);
+    p.label('Fanghöhe 1,80 m',p.X(0)+8,p.Y(1.8)-7,'#245aa8');
+  }
+  if (mode === 'frame') {
+    p.line(10,0,10,2.8,'#9d4900',4);
+    p.line(9.7,2.8,10.3,2.8,'#9d4900',3);
+    p.label('Gerüst 2,80 m',p.X(10)-6,p.Y(2.8)-9,'#853900','right');
+  }
+  const x = 10*t;
+  const y = h(x);
+  p.path(h,x,'#116442',3);
+  const ctx = p.ctx;
+  ctx.save();
+  ctx.translate(p.X(x),p.Y(y));
+  ctx.rotate(x*.55);
+  ctx.beginPath();ctx.arc(0,0,10.5,0,Math.PI*2);
+  ctx.fillStyle='white';ctx.fill();ctx.lineWidth=1.6;ctx.strokeStyle='#182b27';ctx.stroke();
+  ctx.fillStyle='#182b27';
+  for(let i=0;i<5;i++){
+    const angle = i*Math.PI*2/5;
+    ctx.beginPath();ctx.arc(7*Math.cos(angle),7*Math.sin(angle),1.9,0,Math.PI*2);ctx.fill();
+  }
+  ctx.beginPath();
+  for(let i=0;i<5;i++){
+    const angle = i*Math.PI*2/5;
+    ctx.lineTo(3.6*Math.cos(angle),3.6*Math.sin(angle));
+  }
+  ctx.closePath();ctx.fill();ctx.restore();
+  time.value = t;
+  time.setAttribute('aria-valuetext',format(t)+' Sekunden');
+  byId('clock').textContent=format(t)+' s';
+  byId('distance').textContent=format(x)+' m';
+  byId('height').textContent=format(y)+' m';
+}
+
+function setPlaying(value) {
+  playing = value;
+  byId('play').disabled = value;
+  byId('pause').disabled = !value;
+  byId('play').textContent = t>=1.9 ? 'Schuss wiederholen' : t>0 && !value ? 'Weiterfliegen' : 'Schuss starten';
+  if(!value) cancelAnimationFrame(frame);
+}
+function animate(now) {
+  if(!playing) return;
+  if(last !== null) t = Math.min(1.9,t+Math.min(50,now-last)/2600);
+  last = now;
+  drawFlight();
+  if(t<1.9) frame=requestAnimationFrame(animate);
+  else setPlaying(false);
+}
+byId('play').onclick = () => {
+  if(t>=1.9) t=0;
+  last=null;
+  setPlaying(true);
+  frame=requestAnimationFrame(animate);
+};
+byId('pause').onclick = () => setPlaying(false);
+byId('reset').onclick = () => {t=0;setPlaying(false);drawFlight();};
+time.oninput = () => {t=Number(time.value);setPlaying(false);drawFlight();};
+byId('view').onchange = drawFlight;
+
+function drawVelocity() {
+  const first = byId('start'), second = byId('end');
+  const a = Number(first.value);
+  second.min = (a+.01).toFixed(2);
+  const b = Number(second.value);
+  const p = plot('velocity',2,true);
+  p.path(H,1.9,'#116442',2.5);
+  const avg = (H(b)-H(a))/(b-a);
+  const instant = vy(a);
+  const show = byId('measure').checked;
+  byId('slopes').hidden = !show;
+  if(show) {
+    p.clip();
+    p.line(0,H(a)-avg*a,1.9,H(a)+avg*(1.9-a),'#245aa8',2,[7,4]);
+    p.line(Math.max(0,a-.25),H(a)+instant*(Math.max(0,a-.25)-a),
+      Math.min(1.9,a+.25),H(a)+instant*(Math.min(1.9,a+.25)-a),'#9d4900',2);
+    p.ctx.restore();
+    byId('slopes').textContent = 'Sekante: '+format(avg)+' m/s · Tangente bei A: '+format(instant)+' m/s';
+  }
+  p.dot(b,H(b),'#245aa8');p.dot(a,H(a),'#9d4900');
+  p.label('A',p.X(a)-8,p.Y(H(a))-7,'#853900','right');
+  p.label('B',p.X(b)+8,p.Y(H(b))-7,'#245aa8');
+  byId('points').textContent='A: '+format(a)+' s, '+format(H(a))+' m · B: '+format(b)+' s, '+format(H(b))+' m';
+}
+for(const id of ['start','end','measure']) byId(id).addEventListener('input',drawVelocity);
+buildExercises();
+function draw() {drawFlight();drawVelocity();}
+window.addEventListener('resize',draw);
+draw();
+</script>
+</html>
